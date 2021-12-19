@@ -3,9 +3,12 @@ import os
 import requests
 import json
 import random
+import time
 from replit import db
 from AnilistPython import Anilist
 from keep_alive import keep_alive
+
+br=0
 
 anilist = Anilist()
 
@@ -72,8 +75,25 @@ def delete_enc(index):
     del enc[index]
     db["enc"] = enc
 
+def simanimelist(x):
+  data = anilist.extractID.anime(x)
+  max_result = 0
+  counter = 0
+  list = ""
+  for i in range(len(data['data']['Page']['media'])):
+    curr_anime = data['data']['Page']['media'][i]['title']['romaji']
+    list = list + f"{counter + 1}. {curr_anime}"+"\n" 
+    max_result = i + 1
+    counter += 1
+  listg = list+"Select the number conresponding to your anime"
+  return listg
 
-
+def intcheck(message):
+    try:
+        int(message.content)
+        return True
+    except ValueError:
+        return False
 
 @client.event
 async def on_ready():
@@ -156,11 +176,90 @@ async def on_message(msg):
     if val.lower() == "false":
       db["responding"] = False
       await msg.channel.send("Encouraging messages are turned off.")
+  
+  def AnimeId(x,input):
+    data = anilist.extractID.anime(x)
+    max_result = 0
+    counter = 0
+    list = ""
+    for i in range(len(data['data']['Page']['media'])):
+      curr_anime = data['data']['Page']['media'][i]['title']['romaji']
+      list = list + f"{counter + 1}. {curr_anime}"+"\n" 
+      max_result = i + 1
+      counter += 1
+
+    print(list)
+    if counter > 1:
+      try:
+        user_input = input
+      except TypeError:
+        print(f"Your input is incorrect! Please try again!")
+        return -1
+
+      if user_input > max_result or user_input <= 0:
+        print("Your input does not correspound to any of the anime displayed!")
+        return -1
+    elif counter == 0:
+      print(f'No search result has been found for the anime "{x}"!')
+      return -1
+    else:
+      user_input = 1
+    return data['data']['Page']['media'][user_input - 1]['id']
+
+  def AnimeInfo(aid):
+    if aid == -1:
+      return None
+    data = anilist.extractInfo.anime(aid)
+    media_lvl = data['data']['Media']
+    name_romaji = media_lvl['title']['romaji']
+    name_english = media_lvl['title']['english']
+    #starting_time = f'{start_month}/{start_day}/{start_year}'
+    #ending_time = f'{end_month}/{end_day}/{end_year}'
+    start_year = media_lvl['startDate']['year']
+    start_month = media_lvl['startDate']['month']
+    start_day = media_lvl['startDate']['day']
+    end_year = media_lvl['endDate']['year']
+    end_month = media_lvl['endDate']['month']
+    end_day = media_lvl['endDate']['day']
+    next_airing_ep = media_lvl['nextAiringEpisode']
+    cover_image = media_lvl['coverImage']['large']
+    banner_image = media_lvl['bannerImage']
+    airing_format = media_lvl['format']
+    airing_status = media_lvl['status']
+    airing_episodes = media_lvl['episodes']
+    season = media_lvl['season']
+    desc = media_lvl['description']
+    average_score = media_lvl['averageScore']
+    genres = media_lvl['genres']
+
+    anime_dict = {
+      "name_romaji": name_romaji,
+      "name_english": name_english,
+      #"starting_time": starting_time,
+      #"ending_time": ending_time,
+      "cover_image": cover_image,
+      "banner_image": banner_image,
+      "airing_format": airing_format,
+      "airing_status": airing_status,
+      "airing_episodes": airing_episodes,
+      "season": season,
+      "desc": desc,
+      "average_score": average_score,
+      "genres": genres,
+      "next_airing_ep": next_airing_ep,
+     }
+    return anime_dict
 
   if msg.content.startswith('6k anime '):
     x = msg.content.split("6k anime ",1)[1]
-    data = anilist.getAnimeInfo(x)
+    await msg.channel.send(simanimelist(x))
+    message = await client.wait_for("message",check=intcheck, timeout=60)
+    input=int(message.content)
+    print(input)
+    aid = AnimeId(x,input)
+    data = AnimeInfo(aid)
     n = data['name_romaji']
+    print(data)
     await msg.channel.send(n)
     l = len(data['genres'])
     gl=data['genres']
