@@ -197,6 +197,7 @@ async def on_message(msg):
         return -1
 
       if user_input > max_result or user_input <= 0:
+        AnimeId.uinv="Your input does not correspound to any of the anime displayed!"
         print("Your input does not correspound to any of the anime displayed!")
         return -1
     elif counter == 0:
@@ -211,16 +212,17 @@ async def on_message(msg):
       return None
     data = anilist.extractInfo.anime(aid)
     media_lvl = data['data']['Media']
+    #studio=media_lvl['studio']
     name_romaji = media_lvl['title']['romaji']
     name_english = media_lvl['title']['english']
-    #starting_time = f'{start_month}/{start_day}/{start_year}'
-    #ending_time = f'{end_month}/{end_day}/{end_year}'
     start_year = media_lvl['startDate']['year']
     start_month = media_lvl['startDate']['month']
     start_day = media_lvl['startDate']['day']
     end_year = media_lvl['endDate']['year']
     end_month = media_lvl['endDate']['month']
     end_day = media_lvl['endDate']['day']
+    starting_time = f'{start_day}/{start_month}/{start_year}'
+    ending_time = f'{end_day}/{end_month}/{end_year}'
     next_airing_ep = media_lvl['nextAiringEpisode']
     cover_image = media_lvl['coverImage']['large']
     banner_image = media_lvl['bannerImage']
@@ -234,9 +236,10 @@ async def on_message(msg):
 
     anime_dict = {
       "name_romaji": name_romaji,
+      #"studios":studios,
       "name_english": name_english,
-      #"starting_time": starting_time,
-      #"ending_time": ending_time,
+      "starting_time": starting_time,
+      "ending_time": ending_time,
       "cover_image": cover_image,
       "banner_image": banner_image,
       "airing_format": airing_format,
@@ -259,8 +262,6 @@ async def on_message(msg):
     aid = AnimeId(x,input)
     data = AnimeInfo(aid)
     n = data['name_romaji']
-    print(data)
-    await msg.channel.send(n)
     l = len(data['genres'])
     gl=data['genres']
     g=""
@@ -269,10 +270,21 @@ async def on_message(msg):
       if (l-1)>0:
         g=g+", "
         l=l-1
+    tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
+    #date = data['next_airing_ep']['airingAt']
+    print(anilist.extractInfo.anime(aid))
     ani = discord.Embed(title = n,description = data['desc'], color = discord.Colour.blue())
     ani.set_thumbnail(url = f"{data['cover_image']}")
-    ani.add_field(name = 'Average score',value = data['average_score'],inline= False)
     ani.add_field(name = 'Genre',value = g,inline= False)
+    ani.add_field(name = 'Status',value = data['airing_status'],inline= False)
+    ani.add_field(name = 'Format',value = data['airing_format'],inline= False)
+    ani.add_field(name = 'Started at',value = data['starting_time'],inline= False)
+    if str(data['ending_time']) != "None/None/None":
+      ani.add_field(name = 'Ended at',value=data['ending_time'],inline=False)
+    if str(data['next_airing_ep']) != "None":
+      ani.add_field(name = 'Next Episode',value=data['next_airing_ep']['episode'],inline=False)
+      ani.add_field(name = 'Time left for Next Episode',value=tleft,inline=False)
+    ani.add_field(name = 'Average score',value = data['average_score'],inline= False)
     if str(data['banner_image']) != "None":
       ani.set_image(url = f"{data['banner_image']}")
 
