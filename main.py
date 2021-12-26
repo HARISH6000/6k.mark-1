@@ -270,7 +270,6 @@ async def on_message(msg):
       if (l-1)>0:
         g=g+", "
         l=l-1
-    tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
     #date = data['next_airing_ep']['airingAt']
     print(anilist.extractInfo.anime(aid))
     ani = discord.Embed(title = n,description = data['desc'], color = discord.Colour.blue())
@@ -282,6 +281,7 @@ async def on_message(msg):
     if str(data['ending_time']) != "None/None/None":
       ani.add_field(name = 'Ended at',value=data['ending_time'],inline=False)
     if str(data['next_airing_ep']) != "None":
+      tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
       ani.add_field(name = 'Next Episode',value=data['next_airing_ep']['episode'],inline=False)
       ani.add_field(name = 'Time left for Next Episode',value=tleft,inline=False)
     ani.add_field(name = 'Average score',value = data['average_score'],inline= False)
