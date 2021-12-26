@@ -270,7 +270,6 @@ async def on_message(msg):
       if (l-1)>0:
         g=g+", "
         l=l-1
-    
     #date = data['next_airing_ep']['airingAt']
     print(anilist.extractInfo.anime(aid))
     ani = discord.Embed(title = n,description = data['desc'], color = discord.Colour.blue())
