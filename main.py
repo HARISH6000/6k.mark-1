@@ -301,7 +301,7 @@ async def on_message(msg):
       )
     help.set_author(name =f"{user_name}", icon_url=msg.author.avatar_url)
     #help.set_thumbnail(url = 'https://c4.wallpaperflare.com/wallpaper/320/607/818/anime-naruto-kakashi-hatake-naruto-uzumaki-wallpaper-preview.jpg')
-    help.add_field(name= 'Anime Info', value ='1. 6k anime <here goes the name of the anime>', inline=False)
+    help.add_field(name= 'Anime Info', value ='1. 6k anime <here goes the name>', inline=False)
     help.add_field(name= 'Anime Quotes', value ='1. 6k aq(gives a random anime quote) \n2.6k qa <anime name> \n3.6k qc <Character name>', inline=False)
     help.add_field(name= 'Quotes', value ='1. 6k Q (gives a random quote)', inline=False)
     help.add_field(name= 'Encouraging Messages', value ='1. 6k enc respond true (Turns on the encouraging reply)\n2. 6k enc respond false (Turns off the encouraging reply)\n3. 6k enc list (Gives the list of encouraging replies given by the users)\n4. 6k new enc <Here goes ur enc msg>(to add new replies)\n5. 6k del enc <Here goes ur enc msg> (to delete the existing reply)', inline=True)
