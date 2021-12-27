@@ -270,7 +270,6 @@ async def on_message(msg):
       if (l-1)>0:
         g=g+", "
         l=l-1
-    tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
     #date = data['next_airing_ep']['airingAt']
     print(anilist.extractInfo.anime(aid))
     ani = discord.Embed(title = n,description = data['desc'], color = discord.Colour.blue())
@@ -282,6 +281,7 @@ async def on_message(msg):
     if str(data['ending_time']) != "None/None/None":
       ani.add_field(name = 'Ended at',value=data['ending_time'],inline=False)
     if str(data['next_airing_ep']) != "None":
+      tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
       ani.add_field(name = 'Next Episode',value=data['next_airing_ep']['episode'],inline=False)
       ani.add_field(name = 'Time left for Next Episode',value=tleft,inline=False)
     ani.add_field(name = 'Average score',value = data['average_score'],inline= False)
@@ -301,6 +301,7 @@ async def on_message(msg):
       )
     help.set_author(name =f"{user_name}", icon_url=msg.author.avatar_url)
     #help.set_thumbnail(url = 'https://c4.wallpaperflare.com/wallpaper/320/607/818/anime-naruto-kakashi-hatake-naruto-uzumaki-wallpaper-preview.jpg')
+    help.add_field(name= 'Anime Info', value ='1. 6k anime <here goes the name of the anime>', inline=False)
     help.add_field(name= 'Anime Quotes', value ='1. 6k aq(gives a random anime quote) \n2.6k qa <anime name> \n3.6k qc <Character name>', inline=False)
     help.add_field(name= 'Quotes', value ='1. 6k Q (gives a random quote)', inline=False)
     help.add_field(name= 'Encouraging Messages', value ='1. 6k enc respond true (Turns on the encouraging reply)\n2. 6k enc respond false (Turns off the encouraging reply)\n3. 6k enc list (Gives the list of encouraging replies given by the users)\n4. 6k new enc <Here goes ur enc msg>(to add new replies)\n5. 6k del enc <Here goes ur enc msg> (to delete the existing reply)', inline=True)
