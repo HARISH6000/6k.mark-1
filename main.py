@@ -270,24 +270,29 @@ async def on_message(msg):
       if (l-1)>0:
         g=g+", "
         l=l-1
+    boo = False
+    if str(data['banner_image']) =="None":
+      boo = True
     #date = data['next_airing_ep']['airingAt']
     print(anilist.extractInfo.anime(aid))
     ani = discord.Embed(title = n,description = data['desc'], color = discord.Colour.blue())
-    ani.set_thumbnail(url = f"{data['cover_image']}")
-    ani.add_field(name = 'Genre',value = g,inline= False)
-    ani.add_field(name = 'Status',value = data['airing_status'],inline= False)
-    ani.add_field(name = 'Format',value = data['airing_format'],inline= False)
-    ani.add_field(name = 'Started at',value = data['starting_time'],inline= False)
+    if str(data['banner_image']) =="None":
+      ani.set_image(url = f"{data['cover_image']}")
+    ani.add_field(name = 'Genre',value = g,inline= boo)
+    ani.add_field(name = 'Status',value = data['airing_status'],inline= boo)
+    ani.add_field(name = 'Format',value = data['airing_format'],inline= boo)
+    ani.add_field(name = 'Started at',value = data['starting_time'],inline= boo)
     if str(data['ending_time']) != "None/None/None":
-      ani.add_field(name = 'Ended at',value=data['ending_time'],inline=False)
+      ani.add_field(name = 'Ended at',value=data['ending_time'],inline=boo)
     if str(data['next_airing_ep']) != "None":
       tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
-      ani.add_field(name = 'Next Episode',value=data['next_airing_ep']['episode'],inline=False)
-      ani.add_field(name = 'Time left for Next Episode',value=tleft,inline=False)
-    ani.add_field(name = 'Average score',value = data['average_score'],inline= False)
+      ani.add_field(name = 'Next Episode',value=data['next_airing_ep']['episode'],inline=boo)
+      ani.add_field(name = 'Time left for Next Episode',value=tleft,inline=boo)
+    ani.add_field(name = 'Average score',value = data['average_score'],inline= boo)
     if str(data['banner_image']) != "None":
+      ani.set_thumbnail(url = f"{data['cover_image']}")
       ani.set_image(url = f"{data['banner_image']}")
-
+    
     await msg.channel.send(embed = ani)
     #except:
       #await msg.channel.send(f"Anime info not found {sad_emojis[random.randrange(0,14)]}")
