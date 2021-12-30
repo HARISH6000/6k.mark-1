@@ -8,8 +8,6 @@ from replit import db
 from AnilistPython import Anilist
 from keep_alive import keep_alive
 
-br=0
-
 anilist = Anilist()
 
 sad_emojis = [":smiling_face_with_tear:", ":slight_smile:", ":disappointed:",
@@ -75,6 +73,86 @@ def delete_enc(index):
     del enc[index]
     db["enc"] = enc
 
+def charlist(x):
+  max_result = 0
+  counter = 0
+  list=""
+  data = anilist.extractID.character(x)
+  for i in range(len(data['data']['Page']['characters'])):
+    first_name = data['data']['Page']['characters'][i]['name']['first']
+    last_name = data['data']['Page']['characters'][i]['name']['last']
+    max_result = i + 1
+    if last_name == None:
+      print(f"{counter + 1}. {first_name}")
+      list=list+f"{counter + 1}. {first_name}"+"\n"
+    elif first_name == None:
+      print(f"{counter + 1}. {last_name}")
+      list = list+f"{counter + 1}. {last_name}"+"\n"
+    else:
+      print(f'{counter + 1}. {last_name}, {first_name}')
+      list = list+f'{counter + 1}. {last_name}, {first_name}'+"\n"
+    counter += 1
+  if counter>1:
+    list = list +"Please select the character that you are searching for in number:"
+    return list
+  elif counter==0:
+    return "Can't find the character"
+  else:
+    return list
+
+
+def charid(character_name,n):
+  max_result = 0
+  counter = 0
+  data = anilist.extractID.character(character_name)
+  for i in range(len(data['data']['Page']['characters'])):
+    first_name = data['data']['Page']['characters'][i]['name']['first']
+    last_name = data['data']['Page']['characters'][i]['name']['last']
+    max_result = i + 1
+    if last_name == None:
+      print(f"{counter + 1}. {first_name}")
+    elif first_name == None:
+      print(f"{counter + 1}. {last_name}")
+    else:
+      print(f'{counter + 1}. {last_name}, {first_name}')
+    counter += 1
+  if counter > 1:
+    try:
+      user_input = n
+    except TypeError:
+      print(f"Your input is incorrect! Please try again!")
+      return -1
+    if user_input > max_result or user_input <= 0:
+      print("Your input does not correspound to any of the characters!")
+      return -1
+    elif counter == 0:
+      print(f'No search result has been found for the character "{character_name}"!')
+      return -1
+    else:
+      user_input=1
+    return data['data']['Page']['characters'][user_input - 1]['id']
+def getCharacterInfo(cid):
+  character_id = cid
+  if character_id == -1:
+    return None
+
+  data = anilist.extractInfo.character(character_id)
+  character_lvl = data['data']['Character']
+
+  first_name = character_lvl['name']['first']
+  last_name = character_lvl['name']['last']
+  native_name = character_lvl['name']['native']
+
+  desc = character_lvl['description']
+  image = character_lvl['image']['large']
+
+  character_dict = {"first_name": first_name,
+                    "last_name": last_name,
+                    "native_name": native_name,
+                    "desc": desc,
+                    "image": image,}
+
+  return character_dict
 def simanimelist(x):
   data = anilist.extractID.anime(x)
   max_result = 0
@@ -313,7 +391,20 @@ async def on_message(msg):
     
 
     await msg.channel.send(embed = help)
-
+  
+  if msg.content.startswith("6k char "):
+    x = msg.content.split("6k char ",1)[1]
+    await msg.channel.send(charlist(x))
+    message = await client.wait_for("message",check=intcheck, timeout=60)
+    input=int(message.content)
+    cid=charid(x,input)
+    info=anilist.extractInfo.character(cid)
+    print(info)
+    data=getCharacterInfo(cid)
+    ani = discord.Embed(title =data['first_name']+" "+data['last_name'],description = data['desc'], color = discord.Colour.blue())
+    ani = ani.set_thumbnail(url = f"{data['image']}")
+    
+    await msg.channel.send(embed = ani)
 
 
 
