@@ -235,7 +235,7 @@ async def on_message(msg):
   if msg.content.startswith("6k del enc"):
     enc = []
     if "enc" in db.keys():
-      index = int(msg.content.split("6k del enc ",1)[1])
+      index = int(msg.content.split("6k del enc ",1)[1])-1
       delete_enc(index)
       enc = db["enc"]
     await msg.channel.send(enc)
@@ -387,7 +387,7 @@ async def on_message(msg):
     help.add_field(name= 'Anime Info', value ='1. 6k anime <here goes the name>', inline=False)
     help.add_field(name= 'Anime Quotes', value ='1. 6k aq(gives a random anime quote) \n2.6k qa <anime name> \n3.6k qc <Character name>', inline=False)
     help.add_field(name= 'Quotes', value ='1. 6k Q (gives a random quote)', inline=False)
-    help.add_field(name= 'Encouraging Messages', value ='1. 6k enc respond true (Turns on the encouraging reply)\n2. 6k enc respond false (Turns off the encouraging reply)\n3. 6k enc list (Gives the list of encouraging replies given by the users)\n4. 6k new enc <Here goes ur enc msg>(to add new replies)\n5. 6k del enc <Here goes ur enc msg> (to delete the existing reply)', inline=True)
+    help.add_field(name= 'Encouraging Messages', value ='1. 6k enc respond true (Turns on the encouraging reply)\n2. 6k enc respond false (Turns off the encouraging reply)\n3. 6k enc list (Gives the list of encouraging replies given by the users)\n4. 6k new enc <Here goes ur enc msg>(to add new replies)\n5. 6k del enc <Here goes the number coresponding to the enc msg> (to delete the existing reply)', inline=True)
     
 
     await msg.channel.send(embed = help)
@@ -399,9 +399,14 @@ async def on_message(msg):
     input=int(message.content)
     cid=charid(x,input)
     info=anilist.extractInfo.character(cid)
+    print(cid)
     print(info)
     data=getCharacterInfo(cid)
-    ani = discord.Embed(title =data['first_name']+" "+data['last_name'],description = data['desc'], color = discord.Colour.blue())
+    if data['first_name'] and data['last_name'] != None:
+      n=data['first_name']+" "+data['last_name']
+    else:
+      n=data['first_name']
+    ani = discord.Embed(title =n,description = data['desc'], color = discord.Colour.blue())
     ani = ani.set_thumbnail(url = f"{data['image']}")
     
     await msg.channel.send(embed = ani)
