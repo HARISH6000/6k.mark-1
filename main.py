@@ -10,13 +10,15 @@ from keep_alive import keep_alive
 
 anilist = Anilist()
 
+
 sad_emojis = [":smiling_face_with_tear:", ":slight_smile:", ":disappointed:",
 ":pensive:", ":worried:", ":confused:", ":slight_frown:", ":frowning2:",
 ":persevere:", ":confounded:", ":tired_face:", ":weary:", ":cry:", ":sob:",
 ":disappointed_relieved:"]
 
 my_secret = os.environ['Token']
-
+my_id = os.environ['id']
+invite_link= os.environ['invlink']
 client = discord.Client()
 
 sad_words = ["sad", "depressed","hopeless","mournful","sed","depressing","despairing","miserable","heartbroken","sorry","despair","heartbroken"]
@@ -410,6 +412,23 @@ async def on_message(msg):
     ani = ani.set_thumbnail(url = f"{data['image']}")
     
     await msg.channel.send(embed = ani)
+
+  if msg.content.startswith("6k server count"):
+    if str(msg.author.id) == f"{my_id}":
+      server_names = list(client.guilds)
+      n=0
+      user_name = str(msg.author).split('#')[0]
+      names =""
+      for guild in client.guilds:
+        n = n + 1
+        names += f"{n}.{guild.name}" + "\n"
+      sc = discord.Embed(title="Server Count",description=f"I am monitoring {len(server_names)} servers",color = discord.Colour.blue())
+      sc.add_field(name="Servers", value=names, inline=False)
+      sc.add_field(name="Latency",value=(f'Pong! In {round(client.latency * 1000)}ms'))
+      sc.set_author(name=f"{user_name}",icon_url=msg.author.avatar_url)
+      await msg.channel.send(embed=sc)
+    else:
+      await msg.channel.send("Sry,You are not authorised to use this command.")
 
 
 
