@@ -178,6 +178,7 @@ def intcheck(message):
 @client.event
 async def on_ready():
   print('We are in as {0.user}'.format(client))
+  await client.change_presence(status=discord.Status.online, activity=discord.Game('6k help'))
 
 
 @client.event
