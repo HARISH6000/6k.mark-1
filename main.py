@@ -294,6 +294,7 @@ async def on_message(msg):
     data = anilist.extractInfo.anime(aid)
     media_lvl = data['data']['Media']
     #studio=media_lvl['studio']
+    episodes=media_lvl['episodes']
     name_romaji = media_lvl['title']['romaji']
     name_english = media_lvl['title']['english']
     start_year = media_lvl['startDate']['year']
@@ -318,6 +319,7 @@ async def on_message(msg):
     anime_dict = {
       "name_romaji": name_romaji,
       #"studios":studios,
+      "episodes":episodes,
       "name_english": name_english,
       "starting_time": starting_time,
       "ending_time": ending_time,
@@ -361,6 +363,8 @@ async def on_message(msg):
       ani.set_image(url = f"{data['cover_image']}")
     ani.add_field(name = 'Genre',value = g,inline= boo)
     ani.add_field(name = 'Status',value = data['airing_status'],inline= boo)
+    if str(data['episodes']) != "None":
+      ani.add_field(name = 'Episodes',value = data['episodes'],inline= boo)
     ani.add_field(name = 'Format',value = data['airing_format'],inline= boo)
     ani.add_field(name = 'Started at',value = data['starting_time'],inline= boo)
     if str(data['ending_time']) != "None/None/None":
