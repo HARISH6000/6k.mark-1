@@ -459,8 +459,7 @@ async def on_message(msg):
     else:
       index = msg.content.index(" ")
       seithi=msg.content[index:]
-
-    await mention.send(seithi)
+      await mention.send(seithi)
 
 
 
