@@ -286,6 +286,7 @@ async def on_message(msg):
       return -1
     else:
       user_input = 1
+    print(data['data']['Page']['media'][user_input - 1]['id'])
     return data['data']['Page']['media'][user_input - 1]['id']
 
   def AnimeInfo(aid):
@@ -365,6 +366,8 @@ async def on_message(msg):
     ani.add_field(name = 'Status',value = data['airing_status'],inline= boo)
     if str(data['episodes']) != "None":
       ani.add_field(name = 'Episodes',value = data['episodes'],inline= boo)
+    #if str(data['studio']) != "None":
+      #ani.add_field(name = 'Studio',value = data['studio'],inline= boo)
     ani.add_field(name = 'Format',value = data['airing_format'],inline= boo)
     ani.add_field(name = 'Started at',value = data['starting_time'],inline= boo)
     if str(data['ending_time']) != "None/None/None":
@@ -418,7 +421,7 @@ async def on_message(msg):
 
     await msg.channel.send(embed = help)
   
-
+# commands and features for devs
 
   if msg.content.startswith("6k server count"):
     if str(msg.author.id) == f"{my_id}":
@@ -436,6 +439,30 @@ async def on_message(msg):
       await msg.channel.send(embed=sc)
     else:
       await msg.channel.send("Sry,You are not authorised to use this command.")
+    
+  if str(msg.channel.type) == 'private':
+    dm = discord.utils.get(client.get_all_channels(), guild__name='H6k\'s bots', name='6k-dm')
+
+    if msg.attachments != []:
+      files= msg.attachments
+      for file in files:
+        await dm.send("["+msg.author.display_name+"] ")
+        await dm.send(file.url)
+    else:
+      await dm.send("["+msg.author.display_name+"] "+msg.content)
+  if str(msg.channel) == '6k-dm' and msg.content.startswith("<") and str(msg.author.id) == f"{my_id}":
+    mention=msg.mentions[0]
+    if msg.attachments != []:
+      files= msg.attachments
+      for file in files:
+        await mention.send(file.url)
+    else:
+      index = msg.content.index(" ")
+      seithi=msg.content[index:]
+
+    await mention.send(seithi)
+
+
 
 # some anime reference for fun
   if msg.content.startswith("where is sniper island"):
