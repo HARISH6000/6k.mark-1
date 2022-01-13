@@ -177,13 +177,37 @@ def intcheck(message):
         return False
 def string(x,n):
   s=""
-  if n>6000:
-    for i in range(5000):
-      s=s+x[i]
+  if n>4096:
+    i=0
+    while i < 4000:
+      if x[i] == "<" and x[i+1] == "b" and x[i+2] == "r":
+        i=i+4
+        continue
+      elif x[i] == "<" and x[i+1] == "b" and x[i+2] == ">":
+        i=i+3
+        s=s+"**"
+      elif x[i] == "<" and x[i+1] == "/" and x[i+2] == "b":
+        i=i+4
+        s=s+"**"
+      else:
+        s=s+x[i]
+        i=i+1
     return s
   else:
-    for i in range(n):
-      s=s+x[i]
+    i=0
+    while i < n:
+      if x[i] == "<" and x[i+1] == "b" and x[i+2] == "r":
+        i=i+4
+        continue
+      elif x[i] == "<" and x[i+1] == "b" and x[i+2] == ">":
+        i=i+3
+        s=s+"**"
+      elif x[i] == "<" and x[i+1] == "/" and x[i+2] == "b":
+        i=i+4
+        s=s+"**"
+      else:
+        s=s+x[i]
+        i=i+1
     return s
 
 @client.event
@@ -370,7 +394,8 @@ async def on_message(msg):
       boo = True
     #date = data['next_airing_ep']['airingAt']
     print(anilist.extractInfo.anime(aid))
-    ani = discord.Embed(title = n,description = data['desc'], color = discord.Colour.blue())
+    des=string(data['desc'],len(data['desc']))
+    ani = discord.Embed(title = n,description = des, color = discord.Colour.blue())
     if str(data['banner_image']) =="None":
       ani.set_image(url = f"{data['cover_image']}")
     ani.add_field(name = 'Genre',value = g,inline= boo)
@@ -398,6 +423,7 @@ async def on_message(msg):
 
   if msg.content.startswith("6k char "):
     x = msg.content.split("6k char ",1)[1]
+    await msg.channel.send("**CONTAINS SPOILERS FOR BOTH ANIME AND MANGA SO PROCEDE WITH CAUTION**")
     await msg.channel.send(charlist(x))
     choice = await client.wait_for("message",check=intcheck, timeout=60)
     input=int(choice.content)
@@ -412,9 +438,10 @@ async def on_message(msg):
     else:
       n=data['first_name']
     if len(data['desc'])>4096:
-      des=""
-      for i in range(0,4000):
-        des = des+data['desc'][i]
+      des=string(data['desc'],len(data['desc']))
+      #des=""
+      #for i in range(0,4000):
+        #des = des+data['desc'][i]
       des = des+"..... "+"[Read more](https://anilist.co/character/"+str(cid)+"/)"
       ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
     else:
