@@ -103,7 +103,7 @@ def charlist(x):
     return list
 
 
-def charid(character_name,n):
+def charid(character_name,input):
   max_result = 0
   counter = 0
   data = anilist.extractID.character(character_name)
@@ -120,7 +120,8 @@ def charid(character_name,n):
     counter += 1
   if counter > 1:
     try:
-      user_input = n
+      user_input = input
+      print(user_input)
     except TypeError:
       print(f"Your input is incorrect! Please try again!")
       return -1
@@ -130,9 +131,9 @@ def charid(character_name,n):
     elif counter == 0:
       print(f'No search result has been found for the character "{character_name}"!')
       return -1
-    else:
-      user_input=1
-    return data['data']['Page']['characters'][user_input - 1]['id']
+  else:
+    user_input=1
+  return data['data']['Page']['characters'][user_input - 1]['id']
 def getCharacterInfo(cid):
   character_id = cid
   if character_id == -1:
@@ -174,6 +175,16 @@ def intcheck(message):
         return True
     except ValueError:
         return False
+def string(x,n):
+  s=""
+  if n>6000:
+    for i in range(5000):
+      s=s+x[i]
+    return s
+  else:
+    for i in range(n):
+      s=s+x[i]
+    return s
 
 @client.event
 async def on_ready():
@@ -388,8 +399,9 @@ async def on_message(msg):
   if msg.content.startswith("6k char "):
     x = msg.content.split("6k char ",1)[1]
     await msg.channel.send(charlist(x))
-    message = await client.wait_for("message",check=intcheck, timeout=60)
-    input=int(message.content)
+    choice = await client.wait_for("message",check=intcheck, timeout=60)
+    input=int(choice.content)
+    print(input)
     cid=charid(x,input)
     info=anilist.extractInfo.character(cid)
     print(cid)
@@ -399,7 +411,14 @@ async def on_message(msg):
       n=data['first_name']+" "+data['last_name']
     else:
       n=data['first_name']
-    ani = discord.Embed(title =n,description = data['desc'], color = discord.Colour.blue())
+    if len(data['desc'])>4096:
+      des=""
+      for i in range(0,4000):
+        des = des+data['desc'][i]
+      des = des+"..... "+"[Read more](https://anilist.co/character/"+str(cid)+"/)"
+      ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
+    else:
+      ani = discord.Embed(title =n,description = data['desc'], color = discord.Colour.blue())
     ani = ani.set_thumbnail(url = f"{data['image']}")
     
     await msg.channel.send(embed = ani)
