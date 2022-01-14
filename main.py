@@ -193,6 +193,8 @@ def string(x,n):
     s=s.replace("</i>", "*")
     s=s.replace("<i>", "*")
     s=s.replace("__","**")
+    s=s.replace("~!","||")
+    s=s.replace("!~","||")
     return s
   else:
     i=0
@@ -210,6 +212,8 @@ def string(x,n):
     s=s.replace("</b>", "**")
     s=s.replace("</i>", "*")
     s=s.replace("<i>", "*")
+    s=s.replace("~!","||")
+    s=s.replace("!~","||")
     return s
 
 @client.event
@@ -425,7 +429,7 @@ async def on_message(msg):
 
   if msg.content.startswith("6k char "):
     x = msg.content.split("6k char ",1)[1]
-    await msg.channel.send("**CONTAINS SPOILERS FOR BOTH ANIME AND MANGA SO PROCEDE WITH CAUTION**")
+    await msg.channel.send("**CONTAINS SPOILERS FOR BOTH ANIME AND MANGA SO PROCEED WITH CAUTION**")
     await msg.channel.send(charlist(x))
     choice = await client.wait_for("message",check=intcheck, timeout=60)
     input=int(choice.content)
@@ -439,13 +443,17 @@ async def on_message(msg):
       n=data['first_name']+" "+data['last_name']
     else:
       n=data['first_name']
-    des=string(data['desc'],len(data['desc']))
-    if len(data['desc'])>4096:
-      des = des+"..... "+"[Read more](https://anilist.co/character/"+str(cid)+"/)"
-      ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
+    if(str(data['desc'])) != "None":
+      des=string(data['desc'],len(data['desc']))
+      if len(data['desc'])>4096:
+        des = des+"..... "+"[Read more](https://anilist.co/character/"+str(cid)+"/)"
+        ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
+      else:
+        ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
     else:
-      ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
-    ani = ani.set_thumbnail(url = f"{data['image']}")
+      ani = discord.Embed(title =n,description = "Description is not available for this character.", color = discord.Colour.blue())
+    if(str(data['image'])) != "None":
+      ani = ani.set_thumbnail(url = f"{data['image']}")
     
     await msg.channel.send(embed = ani)
 
