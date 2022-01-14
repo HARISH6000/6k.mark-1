@@ -180,34 +180,36 @@ def string(x,n):
   if n>4096:
     i=0
     while i < 4000:
-      if x[i] == "<" and x[i+1] == "b" and x[i+2] == "r":
+      if x[i]=="<" and x[i+1] =="b" and x[i+2] =="r" and x[i+3] ==">" and x[i+4] =="\n":
         i=i+4
+        s=s
         continue
-      elif x[i] == "<" and x[i+1] == "b" and x[i+2] == ">":
-        i=i+3
-        s=s+"**"
-      elif x[i] == "<" and x[i+1] == "/" and x[i+2] == "b":
-        i=i+4
-        s=s+"**"
       else:
         s=s+x[i]
         i=i+1
+    s=s.replace("<br>", "\n")
+    s=s.replace("<b>", "**")
+    s=s.replace("</b>", "**")
+    s=s.replace("</i>", "*")
+    s=s.replace("<i>", "*")
+    s=s.replace("__","**")
     return s
   else:
     i=0
     while i < n:
-      if x[i] == "<" and x[i+1] == "b" and x[i+2] == "r":
+      if x[i]=="<" and x[i+1] =="b" and x[i+2] =="r" and x[i+3] ==">" and x[i+4] =="\n":
         i=i+4
+        s=s
         continue
-      elif x[i] == "<" and x[i+1] == "b" and x[i+2] == ">":
-        i=i+3
-        s=s+"**"
-      elif x[i] == "<" and x[i+1] == "/" and x[i+2] == "b":
-        i=i+4
-        s=s+"**"
       else:
         s=s+x[i]
         i=i+1
+    s=s.replace("<br>", "\n")
+    s=s.replace("__","**")
+    s=s.replace("<b>", "**")
+    s=s.replace("</b>", "**")
+    s=s.replace("</i>", "*")
+    s=s.replace("<i>", "*")
     return s
 
 @client.event
@@ -437,15 +439,12 @@ async def on_message(msg):
       n=data['first_name']+" "+data['last_name']
     else:
       n=data['first_name']
+    des=string(data['desc'],len(data['desc']))
     if len(data['desc'])>4096:
-      des=string(data['desc'],len(data['desc']))
-      #des=""
-      #for i in range(0,4000):
-        #des = des+data['desc'][i]
       des = des+"..... "+"[Read more](https://anilist.co/character/"+str(cid)+"/)"
       ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
     else:
-      ani = discord.Embed(title =n,description = data['desc'], color = discord.Colour.blue())
+      ani = discord.Embed(title =n,description = des, color = discord.Colour.blue())
     ani = ani.set_thumbnail(url = f"{data['image']}")
     
     await msg.channel.send(embed = ani)
