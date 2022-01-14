@@ -156,6 +156,116 @@ def getCharacterInfo(cid):
                     "image": image,}
 
   return character_dict
+
+def mangalist(x):
+  data= anilist.extractID.manga(x)
+  max_result=0
+  counter=0
+  list=""
+  for i in range(len(data['data']['Page']['media'])):
+    curr_manga=data['data']['Page']['media'][i]['title']['romaji']
+    list = list+f"{counter+1}.{curr_manga}"+"\n"
+    counter+=1
+  list=list+"Select the number coresponding to your manga"
+  return list
+
+def MangaId(x,n):
+  data= anilist.extractID.manga(x)
+  max_result=0
+  counter=0
+  list=""
+  for i in range(len(data['data']['Page']['media'])):
+    curr_manga=data['data']['Page']['media'][i]['title']['romaji']
+    list = list+f"{counter+1}.{curr_manga}"+"\n"
+    counter+=1
+    max_result+=1
+  print(list)
+  if counter > 1:
+    try:
+      user_input = n
+    except TypeError:
+      print(f"Your input is incorrect! Please try again!")
+      return -1
+
+    if user_input > max_result or user_input <= 0:
+      MangaId.uinv="Your input does not correspound to any of the anime displayed!"
+      print("Your input does not correspound to any of the anime displayed!")
+      return -1
+  elif counter == 0:
+    print(f'No search result has been found for the anime "{x}"!')
+    return -1
+  else:
+    user_input = 1
+  print(data['data']['Page']['media'][user_input - 1]['id'])
+  return data['data']['Page']['media'][user_input - 1]['id']
+def MangaInfo(mid):
+  if mid == -1:
+    return None
+
+  data = anilist.extractInfo.manga(mid)
+  print(data)
+  media_lvl = data['data']['Media']
+  
+  romaji = media_lvl['title']['romaji']
+  eng= media_lvl['title']['english']
+  desc = media_lvl['description']
+  cov_img = media_lvl['coverImage']['large']
+  ban_img = media_lvl['bannerImage']
+  form = media_lvl['format']
+  chap = media_lvl['chapters']
+  vol = media_lvl['volumes']
+  status =  media_lvl['status']
+  start_year = media_lvl['startDate']['year']
+  start_month = media_lvl['startDate']['month']
+  start_day = media_lvl['startDate']['day']
+  end_year = media_lvl['endDate']['year']
+  end_month = media_lvl['endDate']['month']
+  end_day = media_lvl['endDate']['day']
+  starting_time = f'{start_day}/{start_month}/{start_year}'
+  ending_time = f'{end_day}/{end_month}/{end_year}'
+  #next_airing_ep = media_lvl['nextAiringEpisode']
+  avg_score =  media_lvl['averageScore']
+  mean_score =  media_lvl['meanScore']
+  geners = media_lvl['genres']
+  synonyms = media_lvl['synonyms']
+
+  gen=""
+  l=len(geners)
+  for i in range(len(geners)):
+    gen=gen+geners[i]
+    if (l-1)>0:
+      gen=gen+", "
+      l=l-1
+  
+  syn=""
+  l=len(synonyms)
+  for i in range(l):
+    syn=syn+synonyms[i]
+    if (l-1)>0:
+      syn=syn+", "
+      l=l-1
+
+  manga_dict = {
+    "romaji":romaji,
+    "eng":eng,
+    "desc":desc,
+    "cov":cov_img,
+    "ban":ban_img,
+    "form":form,
+    "chap":chap,
+    "vol":vol,
+    "status":status,
+    "start":starting_time,
+    "end":ending_time,
+    "avg":avg_score,
+    "mean":mean_score,
+    "geners":gen,
+    "syn":syn,
+  }
+
+  return manga_dict
+
+  
 def simanimelist(x):
   data = anilist.extractID.anime(x)
   max_result = 0
@@ -184,6 +294,9 @@ def string(x,n):
         i=i+4
         s=s
         continue
+      if x[i]=="<" and x[i+1] =="a" and x[i+2] ==" " and x[i+3] =="h" and x[i+4] =="r" and x[i+5] =="e" and x[i+6] =="f":
+        s=s+"( [Read at Anilist]("
+        i=i+9
       else:
         s=s+x[i]
         i=i+1
@@ -195,6 +308,9 @@ def string(x,n):
     s=s.replace("__","**")
     s=s.replace("~!","||")
     s=s.replace("!~","||")
+    s=s.replace('">',") ) ")
+    s=s.replace("</a>"," ")
+
     return s
   else:
     i=0
@@ -202,6 +318,10 @@ def string(x,n):
       if x[i]=="<" and x[i+1] =="b" and x[i+2] =="r" and x[i+3] ==">" and x[i+4] =="\n":
         i=i+4
         s=s
+        continue
+      if x[i]=="<" and x[i+1] =="a" and x[i+2] ==" " and x[i+3] =="h" and x[i+4] =="r" and x[i+5] =="e" and x[i+6] =="f":
+        s=s+"( [Read at Anilist]("
+        i=i+9
         continue
       else:
         s=s+x[i]
@@ -214,6 +334,8 @@ def string(x,n):
     s=s.replace("<i>", "*")
     s=s.replace("~!","||")
     s=s.replace("!~","||")
+    s=s.replace('">',") ) ")
+    s=s.replace("</a>"," ")
     return s
 
 @client.event
@@ -226,7 +348,7 @@ async def on_ready():
 async def on_message(msg):
   if msg.author == client.user:
     return
-
+# some basic commands
   if msg.content.startswith('6k hello'):
     await msg.channel.send('Hello there!')
   
@@ -299,6 +421,23 @@ async def on_message(msg):
       db["responding"] = False
       await msg.channel.send("Encouraging messages are turned off.")
   
+  if msg.content.startswith("6k help"):
+    user_name = str(msg.author).split('#')[0]
+    help = discord.Embed(
+      title = "Avaliable Commands",
+      descripion = "Comming soon...",
+      color = discord.Colour.blue()
+      )
+    help.set_author(name =f"{user_name}", icon_url=msg.author.avatar_url)
+    #help.set_thumbnail(url = 'https://c4.wallpaperflare.com/wallpaper/320/607/818/anime-naruto-kakashi-hatake-naruto-uzumaki-wallpaper-preview.jpg')
+    help.add_field(name= 'Info', value ='1. 6k anime <here goes the name>\n2.6k char <here goes the name>', inline=False)
+    help.add_field(name= 'Anime Quotes', value ='1. 6k aq(gives a random anime quote) \n2.6k qa <anime name> \n3.6k qc <Character name>', inline=False)
+    help.add_field(name= 'Quotes', value ='1. 6k Q (gives a random quote)', inline=False)
+    help.add_field(name= 'Encouraging Messages', value ='1. 6k enc respond true (Turns on the encouraging reply)\n2. 6k enc respond false (Turns off the encouraging reply)\n3. 6k enc list (Gives the list of encouraging replies given by the users)\n4. 6k new enc <Here goes ur enc msg>(to add new replies)\n5. 6k del enc <Here goes the number coresponding to the enc msg> (to delete the existing reply)', inline=True)
+    
+
+    await msg.channel.send(embed = help)
+ #Info commands 
   def AnimeId(x,input):
     data = anilist.extractID.anime(x)
     max_result = 0
@@ -377,7 +516,7 @@ async def on_message(msg):
       "next_airing_ep": next_airing_ep,
      }
     return anime_dict
-# commands related to anime
+
   if msg.content.startswith('6k anime '):
     x = msg.content.split("6k anime ",1)[1]
     await msg.channel.send(simanimelist(x))
@@ -456,23 +595,38 @@ async def on_message(msg):
       ani = ani.set_thumbnail(url = f"{data['image']}")
     
     await msg.channel.send(embed = ani)
+  
+  if msg.content.startswith("6k manga "):
+    x = msg.content.split("6k manga ",1)[1]
+    await msg.channel.send(mangalist(x))
+    message = await client.wait_for("message",check=intcheck, timeout=60)
+    input=int(message.content)
+    print(input)
+    mid = MangaId(x,input)
+    data = MangaInfo(mid)
+    des=string(data['desc'],len(data['desc']))
 
-  if msg.content.startswith("6k help"):
-    user_name = str(msg.author).split('#')[0]
-    help = discord.Embed(
-      title = "Avaliable Commands",
-      descripion = "Comming soon...",
-      color = discord.Colour.blue()
-      )
-    help.set_author(name =f"{user_name}", icon_url=msg.author.avatar_url)
-    #help.set_thumbnail(url = 'https://c4.wallpaperflare.com/wallpaper/320/607/818/anime-naruto-kakashi-hatake-naruto-uzumaki-wallpaper-preview.jpg')
-    help.add_field(name= 'Anime Info', value ='1. 6k anime <here goes the name>', inline=False)
-    help.add_field(name= 'Anime Quotes', value ='1. 6k aq(gives a random anime quote) \n2.6k qa <anime name> \n3.6k qc <Character name>', inline=False)
-    help.add_field(name= 'Quotes', value ='1. 6k Q (gives a random quote)', inline=False)
-    help.add_field(name= 'Encouraging Messages', value ='1. 6k enc respond true (Turns on the encouraging reply)\n2. 6k enc respond false (Turns off the encouraging reply)\n3. 6k enc list (Gives the list of encouraging replies given by the users)\n4. 6k new enc <Here goes ur enc msg>(to add new replies)\n5. 6k del enc <Here goes the number coresponding to the enc msg> (to delete the existing reply)', inline=True)
-    
+    man = discord.Embed(title=data['romaji'],description=des,color = discord.Colour.blue())
+    man.set_thumbnail(url = f"{data['cov']}")
+    if(str(data['ban'])) != "None":
+      man.set_image(url = f"{data['ban']}")
+    man.add_field(name = 'Other names',value =data['syn'],inline=False)
+    man.add_field(name = 'Genre',value =data['geners'],inline= False)
+    man.add_field(name = 'Status',value = data['status'],inline=False)
+    if str(data['chap']) != "None":
+      man.add_field(name = "Chapters",value = data['chap'],inline=False)
+    if str(data['vol']) != "None":
+      man.add_field(name = "Volume",value = data['vol'],inline=False)
+    if data['start'] != "None/None/None":
+      man.add_field(name = "Started at",value = data['start'],inline=False)
+    if data['end'] != "None/None/None":
+      man.add_field(name = "Ended at",value = data['end'],inline=False)
+    if data['avg'] != "None":
+      man.add_field(name = "Average Score",value =data['avg'],inline=False)
+    if data['mean'] != "None":
+      man.add_field(name = "Mean Score",value = data['mean'],inline =False)
 
-    await msg.channel.send(embed = help)
+    await msg.channel.send(embed = man)
   
 # commands and features for devs
 
