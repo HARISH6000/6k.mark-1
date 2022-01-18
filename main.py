@@ -21,6 +21,8 @@ my_id = os.environ['id']
 invite_link= os.environ['invlink']
 client = discord.Client()
 
+db["filter"] = True
+
 sad_words = ["sad", "depressed","hopeless","mournful","sed","depressing","despairing","miserable","heartbroken","sorry","despair","heartbroken"]
 
 str_enc = ["Hang in there, buddy!","don`t worry", "Everything will be fine","This is tough, but you're tougher","Don't stress","Sending some good vibes and happy thoughts your way"]
@@ -437,7 +439,15 @@ async def on_message(msg):
     
 
     await msg.channel.send(embed = help)
- #Info commands 
+   #Info commands
+  if msg.content.startswith("6k filter "):
+    bo = msg.content.split("6k filter ",1)[1]
+    if bo.lower()=="true":
+      db["filter"] = True
+      await msg.channel.send("Filter is turned on.")
+    if bo.lower()=="false":
+      db["filter"] = False
+      await msg.channel.send("Filter is turned off.")
   def AnimeId(x,input):
     data = anilist.extractID.anime(x)
     max_result = 0
@@ -516,7 +526,6 @@ async def on_message(msg):
       "next_airing_ep": next_airing_ep,
      }
     return anime_dict
-
   if msg.content.startswith('6k anime '):
     x = msg.content.split("6k anime ",1)[1]
     await msg.channel.send(simanimelist(x))
@@ -524,45 +533,50 @@ async def on_message(msg):
     input=int(message.content)
     print(input)
     aid = AnimeId(x,input)
-    data = AnimeInfo(aid)
-    n = data['name_romaji']
-    l = len(data['genres'])
-    gl=data['genres']
-    g=""
-    for x in range(l):
-      g = g+gl[x]
-      if (l-1)>0:
-        g=g+", "
-        l=l-1
-    boo = False
-    if str(data['banner_image']) =="None":
-      boo = True
-    #date = data['next_airing_ep']['airingAt']
-    print(anilist.extractInfo.anime(aid))
-    des=string(data['desc'],len(data['desc']))
-    ani = discord.Embed(title = n,description = des, color = discord.Colour.blue())
-    if str(data['banner_image']) =="None":
-      ani.set_image(url = f"{data['cover_image']}")
-    ani.add_field(name = 'Genre',value = g,inline= boo)
-    ani.add_field(name = 'Status',value = data['airing_status'],inline= boo)
-    if str(data['episodes']) != "None":
-      ani.add_field(name = 'Episodes',value = data['episodes'],inline= boo)
-    #if str(data['studio']) != "None":
-      #ani.add_field(name = 'Studio',value = data['studio'],inline= boo)
-    ani.add_field(name = 'Format',value = data['airing_format'],inline= boo)
-    ani.add_field(name = 'Started at',value = data['starting_time'],inline= boo)
-    if str(data['ending_time']) != "None/None/None":
-      ani.add_field(name = 'Ended at',value=data['ending_time'],inline=boo)
-    if str(data['next_airing_ep']) != "None":
-      tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
-      ani.add_field(name = 'Next Episode',value=data['next_airing_ep']['episode'],inline=boo)
-      ani.add_field(name = 'Time left for Next Episode',value=tleft,inline=boo)
-    ani.add_field(name = 'Average score',value = data['average_score'],inline= boo)
-    if str(data['banner_image']) != "None":
-      ani.set_thumbnail(url = f"{data['cover_image']}")
-      ani.set_image(url = f"{data['banner_image']}")
+    isAdult=(anilist.extractID.anime(x)['data']['Page']['media'][input - 1]['isAdult'])
+    print(isAdult)
+    if db["filter"] and str(isAdult) == "True":
+      await msg.channel.send("Nsfw filter is turned on. Use ||6k filter false|| command to turn off the filter. ")
+    else:
+      data = AnimeInfo(aid)
+      n = data['name_romaji']
+      l = len(data['genres'])
+      gl=data['genres']
+      g=""
+      for x in range(l):
+        g = g+gl[x]
+        if (l-1)>0:
+          g=g+", "
+          l=l-1
+      boo = False
+      if str(data['banner_image']) =="None":
+        boo = True
+      #date = data['next_airing_ep']['airingAt']
+      print(anilist.extractInfo.anime(aid))
+      des=string(data['desc'],len(data['desc']))
+      ani = discord.Embed(title = n,description = des, color = discord.Colour.blue())
+      if str(data['banner_image']) =="None":
+        ani.set_image(url = f"{data['cover_image']}")
+      ani.add_field(name = 'Genre',value = g,inline= boo)
+      ani.add_field(name = 'Status',value = data['airing_status'],inline= boo)
+      if str(data['episodes']) != "None":
+        ani.add_field(name = 'Episodes',value = data['episodes'],inline= boo)
+      #if str(data['studio']) != "None":
+        #ani.add_field(name = 'Studio',value = data['studio'],inline= boo)
+      ani.add_field(name = 'Format',value = data['airing_format'],inline= boo)
+      ani.add_field(name = 'Started at',value = data['starting_time'],inline= boo)
+      if str(data['ending_time']) != "None/None/None":
+        ani.add_field(name = 'Ended at',value=data['ending_time'],inline=boo)
+      if str(data['next_airing_ep']) != "None":
+        tleft = str(data['next_airing_ep']['timeUntilAiring']/(60*60*24))+" days"
+        ani.add_field(name = 'Next Episode',value=data['next_airing_ep']['episode'],inline=boo)
+        ani.add_field(name = 'Time left for Next Episode',value=tleft,inline=boo)
+      ani.add_field(name = 'Average score',value = data['average_score'],inline= boo)
+      if str(data['banner_image']) != "None":
+        ani.set_thumbnail(url = f"{data['cover_image']}")
+        ani.set_image(url = f"{data['banner_image']}")
     
-    await msg.channel.send(embed = ani)
+      await msg.channel.send(embed = ani)
     #except:
       #await msg.channel.send(f"Anime info not found {sad_emojis[random.randrange(0,14)]}")
 
