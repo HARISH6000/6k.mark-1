@@ -422,7 +422,9 @@ async def on_message(msg):
     if val.lower() == "false":
       db["responding"] = False
       await msg.channel.send("Encouraging messages are turned off.")
-  
+      
+#6k help
+      
   if msg.content.startswith("6k help"):
     user_name = str(msg.author).split('#')[0]
     help = discord.Embed(
@@ -432,7 +434,7 @@ async def on_message(msg):
       )
     help.set_author(name =f"{user_name}", icon_url=msg.author.avatar_url)
     #help.set_thumbnail(url = 'https://c4.wallpaperflare.com/wallpaper/320/607/818/anime-naruto-kakashi-hatake-naruto-uzumaki-wallpaper-preview.jpg')
-    help.add_field(name= 'Info', value ='1. 6k anime <here goes the name>\n2.6k char <here goes the name>', inline=False)
+    help.add_field(name= 'Info', value ='1. 6k anime <here goes the name>\n2.6k char <here goes the name>\n3.6k manga <here goes the name>', inline=False)
     help.add_field(name= 'Anime Quotes', value ='1. 6k aq(gives a random anime quote) \n2.6k qa <anime name> \n3.6k qc <Character name>', inline=False)
     help.add_field(name= 'Quotes', value ='1. 6k Q (gives a random quote)', inline=False)
     help.add_field(name= 'Encouraging Messages', value ='1. 6k enc respond true (Turns on the encouraging reply)\n2. 6k enc respond false (Turns off the encouraging reply)\n3. 6k enc list (Gives the list of encouraging replies given by the users)\n4. 6k new enc <Here goes ur enc msg>(to add new replies)\n5. 6k del enc <Here goes the number coresponding to the enc msg> (to delete the existing reply)', inline=True)
@@ -621,7 +623,8 @@ async def on_message(msg):
     des=string(data['desc'],len(data['desc']))
 
     man = discord.Embed(title=data['romaji'],description=des,color = discord.Colour.blue())
-    man.set_thumbnail(url = f"{data['cov']}")
+    if(str(data['cov']))!="None":
+      man.set_thumbnail(url = f"{data['cov']}")
     if(str(data['ban'])) != "None":
       man.set_image(url = f"{data['ban']}")
     man.add_field(name = 'Other names',value =data['syn'],inline=False)
@@ -685,6 +688,8 @@ async def on_message(msg):
 
 
 # some anime reference for fun
+  if msg.content.startswith("give me notes"):
+    await msg.channel.send("Ask your friends bruh... oh... I see, you don't have any")
   if msg.content.startswith("where is sniper island"):
     us= discord.Embed(title="It's in your heart",color = discord.Colour.from_rgb(165, 42, 42))
     us.set_author(name="Sogeking",icon_url="https://preview.redd.it/9m4294s8wpz41.jpg?auto=webp&s=94fd1b1ddebfb38c09562163e9ba8d3f4e01bf4f")
